@@ -1,0 +1,36 @@
+{
+  "name": "crypto-tracker",
+  "version": "1.0.0",
+  "description": "Crypto Tracker - Monorepo with NestJS API",
+  "packageManager": "pnpm@9.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pnpm --filter=tracker dev",
+    "dev:api": "pnpm --filter=api start:dev",
+    "dev:all": "pnpm --parallel dev:api --filter=tracker dev",
+    "build": "pnpm --filter=tracker build && pnpm --filter=api build",
+    "start": "pnpm --filter=tracker start",
+    "start:api": "pnpm --filter=api start",
+    "start:prod": "pnpm --filter=api start:prod",
+    "test": "pnpm --filter=api test",
+    "test:watch": "pnpm --filter=api test:watch",
+    "test:cov": "pnpm --filter=api test:cov",
+    "test:e2e": "pnpm --filter=api test:e2e",
+    "lint": "pnpm --filter=tracker lint && pnpm --filter=api lint",
+    "type-check": "pnpm --filter=tracker type-check && pnpm --filter=api type-check",
+    "format": "pnpm --filter=api format",
+    "install:all": "pnpm install"
+  },
+  "keywords": [
+    "crypto",
+    "tracker",
+    "nestjs",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "lib/*",
+    "application/*"
+  ]
+}

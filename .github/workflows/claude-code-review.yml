@@ -1,0 +1,95 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR information
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            core.setOutput('number', pr.number);
+            core.setOutput('title', pr.title);
+            core.setOutput('body', pr.body || 'No description');
+            core.setOutput('author', pr.user.login);
+            core.setOutput('head_sha', pr.head.sha);
+
+      - name: Get changed files and diff
+        id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          # Get list of changed files
+          FILES=$(gh pr diff $PR_NUMBER --name-only)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Get full diff
+          DIFF=$(gh pr diff $PR_NUMBER)
+          echo "diff<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post Claude Code review request
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = ${{ steps.pr.outputs.number }};
+            const title = "${{ steps.pr.outputs.title }}";
+            const body = "${{ steps.pr.outputs.body }}";
+            const author = "${{ steps.pr.outputs.author }}";
+            const files = `${{ steps.changes.outputs.files }}`;
+            const diff = `${{ steps.changes.outputs.diff }}`;
+
+            const reviewPrompt = `**Claude Code Review Request**
+
+Please review this Pull Request:
+- **Title**: ${title}
+- **Author**: ${author}
+- **Description**: ${body}
+
+**Changed Files**:
+\`\`\`
+${files}
+\`\`\`
+
+**Changes**:
+\`\`\`diff
+${diff}
+\`\`\`
+
+Please provide:
+1. Summary of changes
+2. Code quality observations
+3. Potential issues or bugs
+4. Security considerations
+5. Performance implications
+6. Suggestions for improvement
+7. Overall assessment (Approve/Request Changes/Comment)
+
+Be constructive and specific with your feedback.`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `🤖 **Claude Code Review**\n\n${reviewPrompt}\n\n---\n*Waiting for Claude Code to analyze...*`
+            });

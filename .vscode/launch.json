@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug API with pnpm",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@crypto-tracker/api", "start:debug"],
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Jest: API Tests Debug",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/application/api/node_modules/jest/bin/jest.js",
+      "args": ["--runInBand", "--watch", "--no-cache"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}/application/api"
+    },
+    {
+      "name": "Jest: Specific Test File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/application/api/node_modules/jest/bin/jest.js",
+      "args": [
+        "--runInBand",
+        "--watch",
+        "--no-cache",
+        "${file}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}/application/api"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack Debug",
+      "configurations": ["NestJS API Debug"]
+    }
+  ]
+}

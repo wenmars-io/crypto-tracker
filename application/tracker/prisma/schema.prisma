@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Currency {
+  id        String     @id @default(cuid())
+  symbol    String     @unique
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Relations
+  prices    CurrencyPrice[]
+  holdings  Holding[]
+
+  @@map("currencies")
+}
+
+model CurrencyPrice {
+  id                String   @id @default(cuid())
+  currencyId        String
+  price             Float?
+  marketCap         Float?
+  volume24h         Float?
+  changePercent24h  Float?
+  lastUpdated       DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  currency          Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
+
+  @@index([currencyId])
+  @@index([lastUpdated])
+  @@map("currency_prices")
+}
+
+model Holding {
+  id            String   @id @default(cuid())
+  currencyId    String
+  quantity      Float
+  purchasePrice Float?
+  purchaseDate  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  currency      Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
+
+  @@index([currencyId])
+  @@map("holdings")
+}

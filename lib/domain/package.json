@@ -1,0 +1,24 @@
+{
+  "name": "@crypto-tracker/domain",
+  "version": "1.0.0",
+  "description": "Domain types and interfaces for Crypto Tracker",
+  "main": "dist/index.js",
+  "types": "dist/types.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "crypto",
+    "domain",
+    "types"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  }
+}
